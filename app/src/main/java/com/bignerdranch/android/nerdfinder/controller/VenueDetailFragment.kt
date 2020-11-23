@@ -71,7 +71,7 @@ class VenueDetailFragment : Fragment(), VenueCheckInListener {
 
     companion object {
         private val ARG_VENUE_ID = "VenueDetailFragment.VenueId"
-
+        private val EXPIRED_DIALOG = "expired_dialog"
         fun newInstance(venueId: String): VenueDetailFragment {
             val fragment = VenueDetailFragment()
 
@@ -91,5 +91,7 @@ class VenueDetailFragment : Fragment(), VenueCheckInListener {
 
     override fun onTokenExpired() {
         checkInButton.visibility = View.GONE
+        val dialogFragment = ExpiredTokenDialogFragment()
+        dialogFragment.show(requireFragmentManager(),EXPIRED_DIALOG)
     }
 }
