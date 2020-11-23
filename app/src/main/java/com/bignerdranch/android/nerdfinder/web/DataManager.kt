@@ -62,6 +62,7 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                 Log.e(TAG, "Failed to check in to venue", t)
                 if(t is UnauthorizedException){
                     tokenStore.accessToken = null
+                    notifyCheckInListenersTokenExpired()
                 }
             }
         })
@@ -69,17 +70,23 @@ class DataManager private constructor(private val tokenStore: TokenStore,
 
     fun getVenue(venueId:String):Venue? = venueList.find { it.id == venueId }
 
-    fun addVenueSearchListener(listener: VenueCheckInListener) {
-        checkInListenerList += listener
+    fun addVenueSearchListener(listener: VenueSearchListener) {
+        searchListenerList += listener
     }
 
-    fun removeVenueSearchListener(listener: VenueCheckInListener) {
-        checkInListenerList -= listener
+    fun removeVenueSearchListener(listener: VenueSearchListener) {
+        searchListenerList -= listener
     }
 
     private fun notifySearchListeners() {
+        for (listener in searchListenerList) {
+            listener.onVenueSearchFinished()
+        }
+    }
+
+    private fun notifyCheckInListenersTokenExpired(){
         for (listener in checkInListenerList) {
-            listener.onVenueCheckInFinished()
+            listener.onTokenExpired()
         }
     }
 

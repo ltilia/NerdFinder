@@ -88,4 +88,10 @@ class VenueDetailFragment : Fragment(), VenueCheckInListener {
         Toast.makeText(getContext(), R.string.successful_check_in_message, Toast.LENGTH_SHORT)
                 .show()
     }
+
+    override fun onTokenExpired() {
+        Toast.makeText(context, "Token expired, please log in again.",
+                Toast.LENGTH_SHORT)
+                .show()
+    }
 }
