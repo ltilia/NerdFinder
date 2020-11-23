@@ -48,6 +48,8 @@ class DataManager private constructor(
                 })
     }
 
+    fun getVenue(venueId:String):Venue? = venueList.find { it.id == venueId }
+
     fun addVenueSearchListener(listener: VenueSearchListener) {
         searchListenerList += listener
     }
