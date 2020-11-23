@@ -55,7 +55,7 @@ class DataManager private constructor(private val tokenStore: TokenStore,
         venueInterface.venueCheckIn(venueId).enqueue(object :Callback<Any>{
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
                 Log.d(TAG, "TEST")
-                notifySearchListeners()
+                notifyCheckInListener()
             }
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
@@ -87,6 +87,12 @@ class DataManager private constructor(private val tokenStore: TokenStore,
     private fun notifyCheckInListenersTokenExpired(){
         for (listener in checkInListenerList) {
             listener.onTokenExpired()
+        }
+    }
+
+    private fun notifyCheckInListener() {
+        for (listener in checkInListenerList) {
+            listener.onVenueCheckInFinished()
         }
     }
 

@@ -90,8 +90,6 @@ class VenueDetailFragment : Fragment(), VenueCheckInListener {
     }
 
     override fun onTokenExpired() {
-        Toast.makeText(context, "Token expired, please log in again.",
-                Toast.LENGTH_SHORT)
-                .show()
+        checkInButton.visibility = View.GONE
     }
 }
