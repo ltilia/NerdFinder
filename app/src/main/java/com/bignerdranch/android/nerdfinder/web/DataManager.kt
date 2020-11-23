@@ -64,8 +64,8 @@ class DataManager private constructor(
     companion object {
         private const val TAG = "DataManager"
         private const val FOURSQUARE_ENDPOINT = "https://api.foursquare.com/v2/"
-        private const val CLIENT_ID = "your_foursquare_app_client_id"
-        private const val CLIENT_SECRET = "your_foursquare_app_client_secret"
+        private const val CLIENT_ID = "0S2NZVLDJLAEL5HJW2TRT23EFB43UAWMOBWUTOL2E0RJDXLY"
+        private const val CLIENT_SECRET = "1WDIOYRJNGKHDN5EOCU04AYABEQOR55VWTAVVMZSNGMWXVEL"
         private const val FOURSQUARE_VERSION = "20150406"
         private const val FOURSQUARE_MODE = "foursquare"
         private const val TEST_LAT_LNG = "33.759,-84.332"
