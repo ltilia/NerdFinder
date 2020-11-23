@@ -3,6 +3,7 @@ package com.bignerdranch.android.nerdfinder.web
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.bignerdranch.android.nerdfinder.listener.VenueCheckInListener
 import com.bignerdranch.android.nerdfinder.listener.VenueSearchListener
 import com.bignerdranch.android.nerdfinder.model.TokenStore
 import com.bignerdranch.android.nerdfinder.model.Venue
@@ -27,7 +28,7 @@ class DataManager private constructor(private val tokenStore: TokenStore,
         private set
 
     private val searchListenerList = mutableListOf<VenueSearchListener>()
-
+    private val checkInListenerList = mutableListOf<VenueCheckInListener>()
     fun fetchVenueSearch() {
         val venueInterface: VenueInterface = retrofit.create(VenueInterface::class.java)
         venueInterface.venueSearch(TEST_LAT_LNG)
@@ -157,5 +158,13 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                 .appendQueryParameter("response_type", "token")
                 .appendQueryParameter("redirect_uri", OAUTH_REDIRECT_URI.trim())
                 .build().toString()
+    }
+
+    fun addVenueCheckInListener(listener:VenueCheckInListener){
+        checkInListenerList += listener
+    }
+
+    fun removeVenueCheckInListener(listener:VenueCheckInListener){
+        checkInListenerList -= listener
     }
 }
