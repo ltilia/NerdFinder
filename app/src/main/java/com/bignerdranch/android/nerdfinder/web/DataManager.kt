@@ -1,5 +1,6 @@
 package com.bignerdranch.android.nerdfinder.web
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -13,6 +14,9 @@ import com.bignerdranch.android.nerdfinder.model.Venue
 import com.bignerdranch.android.nerdfinder.model.VenueSearchResponse
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -51,24 +55,20 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                 })
     }
 
+    @SuppressLint("CheckResult")
     fun checkInToVenue(venueId:String){
         val venueInterface = authenticatedRetrofit.create(VenueInterface::class.java)
-        venueInterface.venueCheckIn(venueId).enqueue(object :Callback<Any>{
-            override fun onResponse(call: Call<Any>, response: Response<Any>) {
-                Log.d(TAG, "TEST")
-                notifyCheckInListener()
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                Log.e(TAG, "Failed to check in to venue", t)
-                if(t is UnauthorizedException){
-                    tokenStore.accessToken = null
-                    notifyCheckInListenersTokenExpired()
-                }
-            }
-        })
+        venueInterface.venueCheckIn(venueId).subscribeOn(Schedulers.io()).
+        observeOn(AndroidSchedulers.mainThread()).subscribe({ notifyCheckInListener()},
+                { error-> handleCheckInException(error)})
     }
 
+    private fun handleCheckInException(error:Throwable){
+        if (error is UnauthorizedException){
+            tokenStore.accessToken = null
+            notifyCheckInListenersTokenExpired()
+        }
+    }
     fun getVenue(venueId:String):Venue? = venueList.find { it.id == venueId }
 
     fun addVenueSearchListener(listener: VenueSearchListener) {
