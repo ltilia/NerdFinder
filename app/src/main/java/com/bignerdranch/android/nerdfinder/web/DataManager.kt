@@ -22,6 +22,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class DataManager private constructor(private val tokenStore: TokenStore,
@@ -136,7 +137,8 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                         .addInterceptor(AuthorizationInterceptor()).addInterceptor(authenticatedRequestInterceptor).build()
 
                 val authenticatedRetrofit = Retrofit.Builder().baseUrl(FOURSQUARE_ENDPOINT)
-                        .client(authenticatedClient).addConverterFactory(GsonConverterFactory.create(gson)).
+                        .client(authenticatedClient).addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create(gson)).
                                 build()
                 tokenStore = TokenStore.getInstance(context)
                 dataManager = DataManager(tokenStore, retrofit,authenticatedRetrofit)
