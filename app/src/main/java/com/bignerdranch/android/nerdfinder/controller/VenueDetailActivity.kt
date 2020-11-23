@@ -3,6 +3,7 @@ package com.bignerdranch.android.nerdfinder.controller
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bignerdranch.android.nerdfinder.R
 
@@ -12,6 +13,7 @@ class VenueDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_venue_detail)
 
+        Toast.makeText(this, "VenueDetailActivity", Toast.LENGTH_LONG ).show()
         val venueId = intent.getStringExtra(ARG_VENUE_ID)!!
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()

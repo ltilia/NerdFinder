@@ -20,8 +20,8 @@ class AuthenticationActivity : AppCompatActivity() {
     private val webViewClient = object :WebViewClient(){
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
             val url = request?.url.toString()
-            if(url.contains(DataManager.OAUTH_REDIRECT_URI)) {
-                FoursquareOauthUriHelper.getAccessToken(url)?.let { token->
+            if(url.contains(DataManager.OAUTH_REDIRECT_URI.trim())) {
+                FoursquareOauthUriHelper.getAccessToken(url)?.let { token ->
                     val tokenStore = TokenStore.getInstance(this@AuthenticationActivity)
                     tokenStore.accessToken = token
                 }

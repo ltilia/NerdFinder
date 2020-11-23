@@ -20,10 +20,8 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class DataManager private constructor(
-    private val tokenStore: TokenStore,
-    private val retrofit: Retrofit
-) {
+class DataManager private constructor(private val tokenStore: TokenStore,
+    private val retrofit: Retrofit) {
 
     var venueList = emptyList<Venue>()
         private set
