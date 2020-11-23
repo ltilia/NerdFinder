@@ -8,9 +8,11 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import com.bignerdranch.android.nerdfinder.web.DataManager
 
 class AuthenticationActivity : AppCompatActivity() {
     private lateinit var webView: WebView
+    private lateinit var dataManager:DataManager
     private val webViewClient = object :WebViewClient(){
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
             return false
@@ -22,6 +24,7 @@ class AuthenticationActivity : AppCompatActivity() {
         webView = WebView(this)
         webView.settings.javaScriptEnabled = true
         webView.webViewClient = webViewClient
+        dataManager = DataManager.get()
         setContentView(webView)
     }
 
