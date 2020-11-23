@@ -10,11 +10,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bignerdranch.android.nerdfinder.R
+import com.bignerdranch.android.nerdfinder.listener.VenueCheckInListener
 import com.bignerdranch.android.nerdfinder.model.TokenStore
 import com.bignerdranch.android.nerdfinder.model.Venue
 import com.bignerdranch.android.nerdfinder.web.DataManager
 
-class VenueDetailFragment : Fragment() {
+class VenueDetailFragment : Fragment(), VenueCheckInListener {
 
     private lateinit var venueId: String
     private lateinit var venue: Venue
@@ -29,6 +30,7 @@ class VenueDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tokenStore = TokenStore.getInstance(requireContext())
+        dataManager.addVenueCheckInListener(this)
     }
 
     override fun onCreateView(
@@ -62,6 +64,7 @@ class VenueDetailFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        dataManager.removeVenueCheckInListener(this)
     }
 
     companion object {
@@ -76,5 +79,10 @@ class VenueDetailFragment : Fragment() {
 
             return fragment
         }
+    }
+
+    override fun onVenueCheckInFinished() {
+        Toast.makeText(getContext(), R.string.successful_check_in_message, Toast.LENGTH_SHORT)
+                .show()
     }
 }
