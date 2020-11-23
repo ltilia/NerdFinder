@@ -21,7 +21,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class DataManager private constructor(private val tokenStore: TokenStore,
-    private val retrofit: Retrofit) {
+    private val retrofit: Retrofit, private val authenticatedRetrofit:Retrofit) {
 
     var venueList = emptyList<Venue>()
         private set
@@ -44,6 +44,19 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                         Log.e(TAG, "Failed to fetch venue search", t)
                     }
                 })
+    }
+
+    fun checkInToVenue(venueId:String){
+        val venueInterface = authenticatedRetrofit.create(VenueInterface::class.java)
+        venueInterface.venueCheckIn(venueId).enqueue(object :Callback<Any>{
+            override fun onResponse(call: Call<Any>, response: Response<Any>) {
+
+            }
+
+            override fun onFailure(call: Call<Any>, t: Throwable) {
+                Log.e(TAG, "Failed to check in to venue", t)
+            }
+        })
     }
 
     fun getVenue(venueId:String):Venue? = venueList.find { it.id == venueId }
@@ -98,8 +111,14 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                         .addConverterFactory(GsonConverterFactory.create(gson))
                         .build()
 
+                val authenticatedClient = OkHttpClient.Builder().addInterceptor(loggingInterceptor)
+                        .addInterceptor(authenticatedRequestInterceptor).build()
+
+                val authenticatedRetrofit = Retrofit.Builder().baseUrl(FOURSQUARE_ENDPOINT)
+                        .client(authenticatedClient).addConverterFactory(GsonConverterFactory.create(gson)).
+                                build()
                 tokenStore = TokenStore.getInstance(context)
-                dataManager = DataManager(tokenStore, retrofit)
+                dataManager = DataManager(tokenStore, retrofit,authenticatedRetrofit)
             }
         }
 
