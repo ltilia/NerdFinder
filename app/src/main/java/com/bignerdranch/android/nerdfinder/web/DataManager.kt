@@ -71,7 +71,7 @@ class DataManager private constructor(
         private const val FOURSQUARE_MODE = "foursquare"
         private const val TEST_LAT_LNG = "33.759,-84.332"
         private const val OAUTH_ENDPOINT = "https://foursquare.com/oauth2/authenticate"
-        const val OAUTH_REDIRECT_URI =  "http://www.bignerdranch.com"
+        const val OAUTH_REDIRECT_URI =  "https://www.bignerdranch.com"
         private var dataManager: DataManager? = null
         private lateinit var tokenStore: TokenStore
 
@@ -124,10 +124,10 @@ class DataManager private constructor(
     }
 
     fun getAuthenticationUrl():String?{
-        return Uri.parse(OAUTH_ENDPOINT).
-        buildUpon().appendQueryParameter("client_id", CLIENT_ID)
+        return Uri.parse(OAUTH_ENDPOINT.trim()).
+        buildUpon().appendQueryParameter("client_id", CLIENT_ID.trim())
                 .appendQueryParameter("response_type", "token")
-                .appendQueryParameter("redirect_uri", OAUTH_REDIRECT_URI)
+                .appendQueryParameter("redirect_uri", OAUTH_REDIRECT_URI.trim())
                 .build().toString()
     }
 }
