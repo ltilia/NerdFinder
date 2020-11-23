@@ -71,6 +71,7 @@ class DataManager private constructor(private val tokenStore: TokenStore,
         private const val FOURSQUARE_MODE = "foursquare"
         private const val TEST_LAT_LNG = "33.759,-84.332"
         private const val OAUTH_ENDPOINT = "https://foursquare.com/oauth2/authenticate"
+        private const val SWARM_MODE = "swarm"
         const val OAUTH_REDIRECT_URI =  "https://www.bignerdranch.com"
         private var dataManager: DataManager? = null
         private lateinit var tokenStore: TokenStore
@@ -119,6 +120,14 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                     .url(url)
                     .build()
 
+            chain.proceed(request)
+        }
+        private val authenticatedRequestInterceptor:Interceptor = Interceptor {chain ->
+            val url = chain.request().url().newBuilder().
+            addQueryParameter("oauth_token", tokenStore.accessToken)
+                    .addQueryParameter("v", FOURSQUARE_ENDPOINT)
+                    .addQueryParameter("m", SWARM_MODE).build()
+            val  request:Request = chain.request().newBuilder().url(url).build()
             chain.proceed(request)
         }
     }
