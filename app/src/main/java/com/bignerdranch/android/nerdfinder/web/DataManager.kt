@@ -1,6 +1,7 @@
 package com.bignerdranch.android.nerdfinder.web
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.bignerdranch.android.nerdfinder.listener.VenueSearchListener
 import com.bignerdranch.android.nerdfinder.model.TokenStore
@@ -69,7 +70,8 @@ class DataManager private constructor(
         private const val FOURSQUARE_VERSION = "20150406"
         private const val FOURSQUARE_MODE = "foursquare"
         private const val TEST_LAT_LNG = "33.759,-84.332"
-
+        private const val OAUTH_ENDPOINT = "https://foursquare.com/oauth2/authenticate"
+        const val OAUTH_REDIRECT_URI =  "http://www.bignerdranch.com"
         private var dataManager: DataManager? = null
         private lateinit var tokenStore: TokenStore
 
@@ -119,5 +121,13 @@ class DataManager private constructor(
 
             chain.proceed(request)
         }
+    }
+
+    fun getAuthenticationUrl():String?{
+        return Uri.parse(OAUTH_ENDPOINT).
+        buildUpon().appendQueryParameter("client_id", CLIENT_ID)
+                .appendQueryParameter("response_type", "token")
+                .appendQueryParameter("redirect_uri", OAUTH_REDIRECT_URI)
+                .build().toString()
     }
 }
