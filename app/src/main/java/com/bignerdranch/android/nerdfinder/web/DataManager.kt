@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import com.bignerdranch.android.nerdfinder.exception.AuthorizationInterceptor
+import com.bignerdranch.android.nerdfinder.exception.UnauthorizedException
 import com.bignerdranch.android.nerdfinder.listener.VenueCheckInListener
 import com.bignerdranch.android.nerdfinder.listener.VenueSearchListener
 import com.bignerdranch.android.nerdfinder.model.TokenStore
@@ -58,6 +60,9 @@ class DataManager private constructor(private val tokenStore: TokenStore,
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
                 Log.e(TAG, "Failed to check in to venue", t)
+                if(t is UnauthorizedException){
+                    tokenStore.accessToken = null
+                }
             }
         })
     }
@@ -115,7 +120,7 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                         .build()
 
                 val authenticatedClient = OkHttpClient.Builder().addInterceptor(loggingInterceptor)
-                        .addInterceptor(authenticatedRequestInterceptor).build()
+                        .addInterceptor(AuthorizationInterceptor()).addInterceptor(authenticatedRequestInterceptor).build()
 
                 val authenticatedRetrofit = Retrofit.Builder().baseUrl(FOURSQUARE_ENDPOINT)
                         .client(authenticatedClient).addConverterFactory(GsonConverterFactory.create(gson)).
