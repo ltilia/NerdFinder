@@ -3,6 +3,7 @@ package com.bignerdranch.android.nerdfinder.web
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import com.bignerdranch.android.nerdfinder.listener.VenueCheckInListener
 import com.bignerdranch.android.nerdfinder.listener.VenueSearchListener
 import com.bignerdranch.android.nerdfinder.model.TokenStore
@@ -51,7 +52,8 @@ class DataManager private constructor(private val tokenStore: TokenStore,
         val venueInterface = authenticatedRetrofit.create(VenueInterface::class.java)
         venueInterface.venueCheckIn(venueId).enqueue(object :Callback<Any>{
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
-
+                Log.d(TAG, "TEST")
+                notifySearchListeners()
             }
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
@@ -62,17 +64,17 @@ class DataManager private constructor(private val tokenStore: TokenStore,
 
     fun getVenue(venueId:String):Venue? = venueList.find { it.id == venueId }
 
-    fun addVenueSearchListener(listener: VenueSearchListener) {
-        searchListenerList += listener
+    fun addVenueSearchListener(listener: VenueCheckInListener) {
+        checkInListenerList += listener
     }
 
-    fun removeVenueSearchListener(listener: VenueSearchListener) {
-        searchListenerList -= listener
+    fun removeVenueSearchListener(listener: VenueCheckInListener) {
+        checkInListenerList -= listener
     }
 
     private fun notifySearchListeners() {
-        for (listener in searchListenerList) {
-            listener.onVenueSearchFinished()
+        for (listener in checkInListenerList) {
+            listener.onVenueCheckInFinished()
         }
     }
 

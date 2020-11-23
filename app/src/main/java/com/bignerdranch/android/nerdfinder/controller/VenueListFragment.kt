@@ -7,13 +7,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bignerdranch.android.nerdfinder.R
+import com.bignerdranch.android.nerdfinder.listener.VenueCheckInListener
 import com.bignerdranch.android.nerdfinder.listener.VenueSearchListener
 import com.bignerdranch.android.nerdfinder.model.TokenStore
 import com.bignerdranch.android.nerdfinder.model.Venue
 import com.bignerdranch.android.nerdfinder.view.VenueListAdapter
 import com.bignerdranch.android.nerdfinder.web.DataManager
 
-class VenueListFragment : Fragment(), VenueSearchListener {
+class VenueListFragment : Fragment(), VenueCheckInListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var venueListAdapter: VenueListAdapter
     private var venueList = emptyList<Venue>()
@@ -83,7 +84,7 @@ class VenueListFragment : Fragment(), VenueSearchListener {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun onVenueSearchFinished() {
+    override fun onVenueCheckInFinished() {
         venueList = dataManager.venueList
         venueListAdapter.venueList = venueList
     }

@@ -13,7 +13,6 @@ class VenueDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_venue_detail)
 
-        Toast.makeText(this, "VenueDetailActivity", Toast.LENGTH_LONG ).show()
         val venueId = intent.getStringExtra(ARG_VENUE_ID)!!
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()

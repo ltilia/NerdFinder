@@ -1,6 +1,7 @@
 package com.bignerdranch.android.nerdfinder.controller
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,12 +26,11 @@ class VenueDetailFragment : Fragment(), VenueCheckInListener {
     private lateinit var checkInButton: Button
     private lateinit var tokenStore: TokenStore
 
-    private val checkInClickListener = View.OnClickListener { }
+    private val checkInClickListener = View.OnClickListener { dataManager.checkInToVenue(venueId)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         tokenStore = TokenStore.getInstance(requireContext())
-        dataManager.addVenueCheckInListener(this)
     }
 
     override fun onCreateView(
@@ -50,6 +50,7 @@ class VenueDetailFragment : Fragment(), VenueCheckInListener {
         super.onStart()
         venueId = requireArguments().getString(ARG_VENUE_ID)!!
         dataManager = DataManager.get()
+        dataManager.addVenueCheckInListener(this)
         venue = dataManager.getVenue(venueId)!!
     }
 
@@ -59,6 +60,7 @@ class VenueDetailFragment : Fragment(), VenueCheckInListener {
         venueAddressTextView.text= venue.formattedAddress
         if(tokenStore.accessToken!=null){
             checkInButton.visibility = View.VISIBLE
+            checkInButton.setOnClickListener(checkInClickListener)
         }
     }
 
@@ -82,6 +84,7 @@ class VenueDetailFragment : Fragment(), VenueCheckInListener {
     }
 
     override fun onVenueCheckInFinished() {
+        Log.d("onVenueCheckInFinished", "test")
         Toast.makeText(getContext(), R.string.successful_check_in_message, Toast.LENGTH_SHORT)
                 .show()
     }
