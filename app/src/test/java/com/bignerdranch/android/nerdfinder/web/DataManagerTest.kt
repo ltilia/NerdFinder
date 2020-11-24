@@ -1,5 +1,6 @@
 package com.bignerdranch.android.nerdfinder.web
 
+import com.bignerdranch.android.nerdfinder.exception.UnauthorizedException
 import com.bignerdranch.android.nerdfinder.listener.VenueCheckInListener
 import com.bignerdranch.android.nerdfinder.listener.VenueSearchListener
 import com.bignerdranch.android.nerdfinder.model.TokenStore
@@ -104,5 +105,14 @@ class DataManagerTest {
         val fakeVenueId = "fakeVenueId"
         dataManager.checkInToVenue(fakeVenueId)
         verify(venueCheckInListener).onVenueCheckInFinished()
+    }
+
+    @Test
+    fun checkInListenerNotifiesTokenExpiredOnUnauthorizedException(){
+        val unauthorizedObservable = Observable.error<Any>(UnauthorizedException())
+        `when`(venueInterface.venueCheckIn(ArgumentMatchers.anyString())).thenReturn(unauthorizedObservable)
+        val fakeVenueId = "fakeVenueId"
+        dataManager.checkInToVenue(fakeVenueId)
+        verify(venueCheckInListener).onTokenExpired()
     }
 }
