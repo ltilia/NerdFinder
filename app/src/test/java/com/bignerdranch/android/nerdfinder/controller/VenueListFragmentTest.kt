@@ -2,8 +2,10 @@ package com.bignerdranch.android.nerdfinder.controller
 
 import android.app.Application
 import android.os.Build
+import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.bignerdranch.android.nerdfinder.R
 import com.bignerdranch.android.nerdfinder.SynchronousExecutorService
 import com.bignerdranch.android.nerdfinder.model.TokenStore
 import com.bignerdranch.android.nerdfinder.model.VenueSearchResponse
@@ -15,9 +17,13 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule
 import com.google.gson.GsonBuilder
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.notNullValue
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import retrofit2.Retrofit
@@ -54,5 +60,17 @@ class VenueListFragmentTest {
     @After
     fun tearDown(){
         TestDataManager.reset()
+    }
+
+    @Test
+    fun activityListsVenuesReturnedFromSearch(){
+        val  activityScenario =launch(VenueListActivity::class.java)
+        activityScenario.onActivity { venueListActivity->
+            val venueListFragment = venueListActivity.supportFragmentManager
+                    .findFragmentById(R.id.fragmentContainer) as VenueListFragment
+
+            assertThat(venueListFragment, `is`(notNullValue()))
+        }
+
     }
 }
