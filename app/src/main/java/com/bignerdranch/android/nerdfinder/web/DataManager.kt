@@ -32,6 +32,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 open class DataManager protected constructor(private val tokenStore: TokenStore,
                                    private val retrofit: Retrofit, private val authenticatedRetrofit:Retrofit) {
 
+    open val observeOnScheduler:Scheduler
+    get() = AndroidSchedulers.mainThread()
+    open val subscribeOnScheduler:Scheduler
+    get() = Schedulers.io()
+
     var venueList = emptyList<Venue>()
         private set
 
@@ -58,8 +63,8 @@ open class DataManager protected constructor(private val tokenStore: TokenStore,
     @SuppressLint("CheckResult")
     fun checkInToVenue(venueId:String){
         val venueInterface = authenticatedRetrofit.create(VenueInterface::class.java)
-        venueInterface.venueCheckIn(venueId).subscribeOn(Schedulers.io()).
-        observeOn(AndroidSchedulers.mainThread()).subscribe({ notifyCheckInListener()},
+        venueInterface.venueCheckIn(venueId).subscribeOn(subscribeOnScheduler).
+        observeOn(observeOnScheduler).subscribe({ notifyCheckInListener()},
                 { error-> handleCheckInException(error)})
     }
 
