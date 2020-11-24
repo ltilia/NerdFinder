@@ -5,12 +5,14 @@ import com.bignerdranch.android.nerdfinder.model.TokenStore
 import com.bignerdranch.android.nerdfinder.model.VenueSearchResponse
 import org.junit.After
 import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.*
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.reset
+import org.mockito.Mockito.*
+import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.Response
 import retrofit2.Retrofit
 
 inline fun <reified T:Any> mock() = Mockito.mock(T::class.java)
@@ -44,5 +46,18 @@ class DataManagerTest {
         reset(retrofit, authenticatedRetrofit, venueInterface, venueSearchListener,tokenStore)
         dataManager.removeVenueSearchListener(venueSearchListener)
         TestDataManager.reset()
+    }
+
+    @Test
+    fun searchListenerTriggeredOnSuccessfulSearch(){
+        val responseCall: Call<VenueSearchResponse> = mock()
+        `when`(venueInterface.venueSearch
+        (ArgumentMatchers.anyString())).thenReturn(responseCall)
+        dataManager.fetchVenueSearch()
+        verify(responseCall).enqueue(searchCaptor.capture())
+        val venueSearchResponse:VenueSearchResponse = mock()
+        val response = Response.success(venueSearchResponse)
+        searchCaptor.value.onResponse(responseCall, response)
+        verify(venueSearchListener).onVenueSearchFinished()
     }
 }
