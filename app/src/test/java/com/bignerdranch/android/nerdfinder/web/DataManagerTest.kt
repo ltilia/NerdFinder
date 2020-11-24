@@ -115,4 +115,14 @@ class DataManagerTest {
         dataManager.checkInToVenue(fakeVenueId)
         verify(venueCheckInListener).onTokenExpired()
     }
+
+    @Test
+    fun tokenClearedFromTokenStoreOnUnauthorizedException(){
+        val unauthorizedObservable = Observable.error<Any>(UnauthorizedException())
+        `when`(venueInterface.venueCheckIn(ArgumentMatchers.anyString())).
+        thenReturn(unauthorizedObservable)
+        val fakeVenueId = "fakeVenueId"
+        dataManager.checkInToVenue(fakeVenueId)
+        verify(tokenStore).accessToken = null
+    }
 }
