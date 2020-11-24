@@ -2,6 +2,8 @@ package com.bignerdranch.android.nerdfinder.controller
 
 import android.app.Application
 import android.os.Build
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario.launch
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -17,9 +19,7 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule
 import com.google.gson.GsonBuilder
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.CoreMatchers.notNullValue
-import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.CoreMatchers.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -29,7 +29,8 @@ import org.robolectric.annotation.Config
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-
+import  org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.CoreMatchers.equalTo
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = Application::class)
 class VenueListFragmentTest {
@@ -70,6 +71,19 @@ class VenueListFragmentTest {
                     .findFragmentById(R.id.fragmentContainer) as VenueListFragment
 
             assertThat(venueListFragment, `is`(notNullValue()))
+            val venueRecyclerView = venueListFragment.view!!.
+            findViewById<RecyclerView>(R.id.venueListRecyclerView)
+            assertThat(venueRecyclerView,  `is`(notNullValue()))
+            assertThat(venueRecyclerView.adapter!!.itemCount, `is`(2))
+            var bnrTitle=  "BNR Intergalactic Headquarters"
+            val rndTitle ="Ration and Dram"
+            val firstVenueView = venueRecyclerView.getChildAt(0)
+            val venueTitleTextView = firstVenueView.findViewById<TextView>(R.id.view_venue_list_VenueTitleTextView)
+            assertThat(venueTitleTextView.text.toString(), `is`(equalTo(bnrTitle)))
+
+            val secondVenueView = venueRecyclerView.getChildAt(1)
+            val venueTitleTextView2 = secondVenueView.findViewById<TextView>(R.id.view_venue_list_VenueTitleTextView)
+            assertThat(venueTitleTextView2.text.toString(),`is`(equalTo(rndTitle)))
         }
 
     }
