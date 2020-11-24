@@ -10,6 +10,7 @@ import com.bignerdranch.android.nerdfinder.model.VenueSearchResponse
 import com.bignerdranch.android.nerdfinder.web.DataManager
 import com.bignerdranch.android.nerdfinder.web.TestDataManager
 import com.bignerdranch.android.nerdfinder.web.VenueListDeserializer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.junit.WireMockRule
 import com.google.gson.GsonBuilder
 import okhttp3.Dispatcher
@@ -46,6 +47,8 @@ class VenueListFragmentTest {
                 .addConverterFactory(GsonConverterFactory.create(gson)).
                 addCallAdapterFactory(RxJava2CallAdapterFactory.create()).build()
         dataManager = TestDataManager.getInstance(tokenStore,basicRetrofit,authenticatedRetrofit)
+        WireMock.stubFor(WireMock.get(WireMock.urlMatching("/venues/search.*"))
+                .willReturn(WireMock.aResponse().withStatus(200).withBodyFile("search.json")))
     }
 
     @After
