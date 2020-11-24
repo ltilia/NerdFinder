@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.bignerdranch.android.nerdfinder.SynchronousExecutorService
 import com.bignerdranch.android.nerdfinder.model.TokenStore
 import com.bignerdranch.android.nerdfinder.model.VenueSearchResponse
 import com.bignerdranch.android.nerdfinder.web.DataManager
@@ -11,6 +12,8 @@ import com.bignerdranch.android.nerdfinder.web.TestDataManager
 import com.bignerdranch.android.nerdfinder.web.VenueListDeserializer
 import com.github.tomakehurst.wiremock.junit.WireMockRule
 import com.google.gson.GsonBuilder
+import okhttp3.Dispatcher
+import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -33,7 +36,9 @@ class VenueListFragmentTest {
         val gson = GsonBuilder().registerTypeAdapter(VenueSearchResponse::class.java,
                 VenueListDeserializer()).create()
 
-        val basicRetrofit = Retrofit.Builder().baseUrl(endpoint).
+        val executorService = SynchronousExecutorService()
+        val client = OkHttpClient.Builder().dispatcher(Dispatcher(executorService)).build()
+        val basicRetrofit = Retrofit.Builder().baseUrl(endpoint).client(client).
         addConverterFactory(GsonConverterFactory.create(gson)).build()
 
         val tokenStore = TokenStore.getInstance(ApplicationProvider.getApplicationContext())
