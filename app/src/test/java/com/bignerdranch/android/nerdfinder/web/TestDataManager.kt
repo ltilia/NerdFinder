@@ -10,7 +10,6 @@ class TestDataManager private constructor(tokenStore: TokenStore,
     companion object{
         fun getInstance(tokenStore: TokenStore, retrofit: Retrofit,
                         authenticatedRetrofit:Retrofit):DataManager{
-
             if(dataManager==null){
                 dataManager = TestDataManager(tokenStore, retrofit, authenticatedRetrofit)
             }

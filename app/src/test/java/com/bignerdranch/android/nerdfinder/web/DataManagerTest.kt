@@ -26,5 +26,6 @@ class DataManagerTest {
     @Before
     fun setup(){
         MockitoAnnotations.initMocks(this)
+        dataManager = TestDataManager.getInstance(tokenStore, retrofit, authenticatedRetrofit)
     }
 }
