@@ -16,5 +16,10 @@ class TestDataManager private constructor(tokenStore: TokenStore,
             return dataManager!!
 
         }
+
+        fun reset(){
+            dataManager = null
+        }
     }
+
 }
