@@ -1,9 +1,11 @@
 package com.bignerdranch.android.nerdfinder.web
 
+import com.bignerdranch.android.nerdfinder.listener.VenueCheckInListener
 import com.bignerdranch.android.nerdfinder.listener.VenueSearchListener
 import com.bignerdranch.android.nerdfinder.model.TokenStore
 import com.bignerdranch.android.nerdfinder.model.Venue
 import com.bignerdranch.android.nerdfinder.model.VenueSearchResponse
+import io.reactivex.Observable
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.junit.After
@@ -18,6 +20,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import org.hamcrest.CoreMatchers.`is`
 import retrofit2.Retrofit
+import java.util.*
 
 inline fun <reified T:Any> mock() = Mockito.mock(T::class.java)
 @RunWith(JUnit4::class)
@@ -36,19 +39,24 @@ class DataManagerTest {
     private lateinit var venueInterface:VenueInterface
     @Mock
     private lateinit var venueSearchListener:VenueSearchListener
+    @Mock
+    private lateinit var venueCheckInListener:VenueCheckInListener
 
     @Before
     fun setup(){
         MockitoAnnotations.initMocks(this)
         dataManager = TestDataManager.getInstance(tokenStore, retrofit, authenticatedRetrofit)
         `when`(retrofit.create(VenueInterface::class.java)).thenReturn(venueInterface)
+        `when`(authenticatedRetrofit.create(VenueInterface::class.java)).thenReturn(venueInterface)
         dataManager.addVenueSearchListener(venueSearchListener)
+        dataManager.addVenueCheckInListener(venueCheckInListener)
     }
 
     @After
     fun tearDown(){
         reset(retrofit, authenticatedRetrofit, venueInterface, venueSearchListener,tokenStore)
         dataManager.removeVenueSearchListener(venueSearchListener)
+        dataManager.removeVenueCheckInListener(venueCheckInListener)
         TestDataManager.reset()
     }
 
@@ -86,5 +94,15 @@ class DataManagerTest {
         val dataManagerVenueList = dataManager.venueList
         MatcherAssert.assertThat(dataManagerVenueList, `is`(CoreMatchers.equalTo(venueList)))
 
+    }
+
+    @Test
+    fun checkInListenerTriggeredOnSuccessfulCheckIn(){
+        val successObservable = Observable.just(Any())
+        `when`(venueInterface.venueCheckIn(ArgumentMatchers.anyString())).
+        thenReturn(successObservable)
+        val fakeVenueId = "fakeVenueId"
+        dataManager.checkInToVenue(fakeVenueId)
+        verify(venueCheckInListener).onVenueCheckInFinished()
     }
 }
