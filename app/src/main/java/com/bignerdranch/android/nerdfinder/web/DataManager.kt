@@ -29,8 +29,8 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-class DataManager private constructor(private val tokenStore: TokenStore,
-    private val retrofit: Retrofit, private val authenticatedRetrofit:Retrofit) {
+open class DataManager protected constructor(private val tokenStore: TokenStore,
+                                   private val retrofit: Retrofit, private val authenticatedRetrofit:Retrofit) {
 
     var venueList = emptyList<Venue>()
         private set
@@ -108,8 +108,8 @@ class DataManager private constructor(private val tokenStore: TokenStore,
         private const val OAUTH_ENDPOINT = "https://foursquare.com/oauth2/authenticate"
         private const val SWARM_MODE = "swarm"
         const val OAUTH_REDIRECT_URI =  "https://www.bignerdranch.com"
-        private var dataManager: DataManager? = null
-        private lateinit var tokenStore: TokenStore
+        var dataManager: DataManager? = null
+        lateinit var tokenStore: TokenStore
 
         fun initialize(context: Context) {
             if (dataManager == null) {
