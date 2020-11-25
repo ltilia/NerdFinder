@@ -19,7 +19,7 @@ import com.bignerdranch.android.nerdfinder.web.DataManager
 class VenueDetailFragment : Fragment(), VenueCheckInListener {
 
     private lateinit var venueId: String
-    private lateinit var venue: Venue
+    private  var venue: Venue?=null
     private lateinit var dataManager:DataManager
     private lateinit var venueNameTextView: TextView
     private lateinit var venueAddressTextView: TextView
@@ -51,13 +51,13 @@ class VenueDetailFragment : Fragment(), VenueCheckInListener {
         venueId = requireArguments().getString(ARG_VENUE_ID)!!
         dataManager = DataManager.get()
         dataManager.addVenueCheckInListener(this)
-        venue = dataManager.getVenue(venueId)!!
+        venue = dataManager.getVenue(venueId)
     }
 
     override fun onResume() {
         super.onResume()
-        venueNameTextView.text = venue.name
-        venueAddressTextView.text= venue.formattedAddress
+        venueNameTextView.text = venue?.name
+        venueAddressTextView.text= venue?.formattedAddress
         if(tokenStore.accessToken!=null){
             checkInButton.visibility = View.VISIBLE
             checkInButton.setOnClickListener(checkInClickListener)

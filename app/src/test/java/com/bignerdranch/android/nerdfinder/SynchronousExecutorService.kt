@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 class SynchronousExecutorService:ExecutorService {
 
     override fun execute(command: Runnable?) {
-        TODO("Not yet implemented")
+
     }
 
     override fun shutdown() {
