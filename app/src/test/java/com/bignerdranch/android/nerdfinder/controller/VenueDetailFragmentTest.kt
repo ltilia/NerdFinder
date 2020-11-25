@@ -138,4 +138,26 @@ class VenueDetailFragmentTest {
             assertThat(alertDialog.message.toString(), `is`(equalTo(expectedDialogMessage)))
         }
     }
+
+    @Test
+    fun errorDialogNotShownOnDifferentException() {
+        stubFor(
+                post(urlMatching("/checkins/add.*"))
+                        .willReturn(
+                                aResponse()
+                                        .withStatus(500)
+                        )
+        )
+        val bnrVenueId = "527c1d4f11d20f41ba39fc01"
+        val detailIntent: Intent = VenueDetailActivity
+                .newIntent(ApplicationProvider.getApplicationContext(), bnrVenueId)
+        val activityScenario = launch<VenueDetailActivity>(detailIntent)
+        activityScenario.onActivity { activity ->
+            onView(withId(R.id.fragment_venue_detail_check_in_button))
+                    .perform(click())
+            ShadowLooper.idleMainLooper()
+            val errorDialog = ShadowAlertDialog.getLatestAlertDialog()
+            assertThat(errorDialog, `is`(nullValue()))
+        }
+    }
 }
