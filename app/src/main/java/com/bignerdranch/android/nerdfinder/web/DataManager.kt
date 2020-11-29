@@ -1,9 +1,12 @@
 package com.bignerdranch.android.nerdfinder.web
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import com.bignerdranch.android.nerdfinder.exception.AuthorizationInterceptor
+import com.bignerdranch.android.nerdfinder.exception.UnauthorizedException
 import com.bignerdranch.android.nerdfinder.listener.VenueCheckInListener
 import com.bignerdranch.android.nerdfinder.listener.VenueSearchListener
 import com.bignerdranch.android.nerdfinder.model.TokenStore
@@ -11,6 +14,9 @@ import com.bignerdranch.android.nerdfinder.model.Venue
 import com.bignerdranch.android.nerdfinder.model.VenueSearchResponse
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import okhttp3.HttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -20,6 +26,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class DataManager private constructor(private val tokenStore: TokenStore,
@@ -48,31 +55,43 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                 })
     }
 
+    @SuppressLint("CheckResult")
     fun checkInToVenue(venueId:String){
         val venueInterface = authenticatedRetrofit.create(VenueInterface::class.java)
-        venueInterface.venueCheckIn(venueId).enqueue(object :Callback<Any>{
-            override fun onResponse(call: Call<Any>, response: Response<Any>) {
-                Log.d(TAG, "TEST")
-                notifySearchListeners()
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                Log.e(TAG, "Failed to check in to venue", t)
-            }
-        })
+        venueInterface.venueCheckIn(venueId).subscribeOn(Schedulers.io()).
+        observeOn(AndroidSchedulers.mainThread()).subscribe({ notifyCheckInListener()},
+                { error-> handleCheckInException(error)})
     }
 
+    private fun handleCheckInException(error:Throwable){
+        if (error is UnauthorizedException){
+            tokenStore.accessToken = null
+            notifyCheckInListenersTokenExpired()
+        }
+    }
     fun getVenue(venueId:String):Venue? = venueList.find { it.id == venueId }
 
-    fun addVenueSearchListener(listener: VenueCheckInListener) {
-        checkInListenerList += listener
+    fun addVenueSearchListener(listener: VenueSearchListener) {
+        searchListenerList += listener
     }
 
-    fun removeVenueSearchListener(listener: VenueCheckInListener) {
-        checkInListenerList -= listener
+    fun removeVenueSearchListener(listener: VenueSearchListener) {
+        searchListenerList -= listener
     }
 
     private fun notifySearchListeners() {
+        for (listener in searchListenerList) {
+            listener.onVenueSearchFinished()
+        }
+    }
+
+    private fun notifyCheckInListenersTokenExpired(){
+        for (listener in checkInListenerList) {
+            listener.onTokenExpired()
+        }
+    }
+
+    private fun notifyCheckInListener() {
         for (listener in checkInListenerList) {
             listener.onVenueCheckInFinished()
         }
@@ -115,10 +134,11 @@ class DataManager private constructor(private val tokenStore: TokenStore,
                         .build()
 
                 val authenticatedClient = OkHttpClient.Builder().addInterceptor(loggingInterceptor)
-                        .addInterceptor(authenticatedRequestInterceptor).build()
+                        .addInterceptor(AuthorizationInterceptor()).addInterceptor(authenticatedRequestInterceptor).build()
 
                 val authenticatedRetrofit = Retrofit.Builder().baseUrl(FOURSQUARE_ENDPOINT)
-                        .client(authenticatedClient).addConverterFactory(GsonConverterFactory.create(gson)).
+                        .client(authenticatedClient).addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create(gson)).
                                 build()
                 tokenStore = TokenStore.getInstance(context)
                 dataManager = DataManager(tokenStore, retrofit,authenticatedRetrofit)
