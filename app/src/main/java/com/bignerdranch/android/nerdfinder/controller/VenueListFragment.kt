@@ -14,7 +14,7 @@ import com.bignerdranch.android.nerdfinder.model.Venue
 import com.bignerdranch.android.nerdfinder.view.VenueListAdapter
 import com.bignerdranch.android.nerdfinder.web.DataManager
 
-class VenueListFragment : Fragment(), VenueCheckInListener {
+class VenueListFragment : Fragment(), VenueSearchListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var venueListAdapter: VenueListAdapter
     private var venueList = emptyList<Venue>()
@@ -84,7 +84,7 @@ class VenueListFragment : Fragment(), VenueCheckInListener {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun onVenueCheckInFinished() {
+    override fun onVenueSearchFinished() {
         venueList = dataManager.venueList
         venueListAdapter.venueList = venueList
     }

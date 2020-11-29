@@ -1,5 +1,5 @@
 package com.bignerdranch.android.nerdfinder.listener
 
-interface VenueCheckInListener {
+interface VenueCheckInListener:AuthenticationListener {
     fun onVenueCheckInFinished()
 }
